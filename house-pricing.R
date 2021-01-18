@@ -21,6 +21,7 @@ set.seed(123)
 train_indices <- sample(seq_len(nrow(df)), size = sample_size, replace = FALSE)
 
 train <- df[train_indices,]
+test <- df[-train_indices,]
 
 # feature engineering
 find_na <- function(df){
@@ -54,26 +55,39 @@ visualize_na <- function(train){
   return(p)
 }
 
-na <- find_na(train)
-head(na)
-
-visualize_na(train)
-
-train <- delete_na(train, 0.8)
-
-visualize_na(train)
-
-replace_mean <- function(data, column){
+replace_ <- function(data, column, value){
   xbar = mean(as.matrix(data[column]), na.rm = TRUE)
+  mode <- getmode(data[column])[1]
   for(i in 1:nrow(data[column])){
-    if(is.na(data[i, column]) == TRUE){
-      data[i, column] = xbar
+    if(is.na(data[i, column])){
+      if(value == "xbar"){
+        data[i, column] = xbar
+      } 
+      if(value == "mode"){
+        if(is.na(as.double(mode)) == FALSE){
+          data[i, column] = as.double(mode)
+        } else {
+          data[i, column] = mode
+        }
+      }
     }
   }
   return(data)
 }
 
-train <- replace_mean(train, "LotFrontage")
+getmode <- function(x) {
+  names(table(x))[table(x)==max(table(x))]
+}
 
-train["LotFrontage"]
+visualize_na(train)
+
+train <- delete_na(train, 0.8)
+train <- replace_(train, "LotFrontage", value = "xbar")
+train <- replace_(train, "GarageYrBlt", value = "mode")
+train <- replace_(train, "GarageType", value = "mode")
+train <- replace_(train, "GarageQual", value = "mode")
+train <- replace_(train, "GarageCond", value = "mode")
+train <- replace_(train, "GarageFinish", value = "mode")
+visualize_na(train)
+
 
