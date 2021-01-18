@@ -53,27 +53,12 @@ visualize_na <- function(train){
     theme_minimal()
   return(p)
 }
-
+# apply feature engineer
 na <- find_na(train)
 head(na)
 
 visualize_na(train)
 
-train <- delete_na(train, 0.8)
+train <- delete_na(train, 0.9)
 
 visualize_na(train)
-
-replace_mean <- function(data, column){
-  xbar = mean(as.matrix(data[column]), na.rm = TRUE)
-  for(i in 1:nrow(data[column])){
-    if(is.na(data[i, column]) == TRUE){
-      data[i, column] = xbar
-    }
-  }
-  return(data)
-}
-
-train <- replace_mean(train, "LotFrontage")
-
-train["LotFrontage"]
-
