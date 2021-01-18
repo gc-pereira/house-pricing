@@ -3,11 +3,11 @@ library(readr)
 library(tidyverse)
 library(dplyr)
 
-df_train <- read_csv('/home/gabriel/Desktop/house-pricing/train.csv')
-df_test <- read_csv('/home/gabriel/Desktop/house-pricing/test.csv')
+train <- read_csv('/home/gabriel/Desktop/house-pricing/train.csv')
+test <- read_csv('/home/gabriel/Desktop/house-pricing/test.csv')
 
-df <- df_train %>% full_join(df_test)
-head(df)
+#df <- df_train %>% full_join(df_test)
+#head(df)
 
 shape <- function(df){
   s = c(ncol(df), nrow(df))
@@ -15,13 +15,13 @@ shape <- function(df){
 }
 
 # train test split
-split_size = 0.70
-sample_size = floor(split_size * nrow(df))
-set.seed(123)
-train_indices <- sample(seq_len(nrow(df)), size = sample_size, replace = FALSE)
+#split_size = 0.70
+#sample_size = floor(split_size * nrow(df))
+#set.seed(123)
+#train_indices <- sample(seq_len(nrow(df)), size = sample_size, replace = FALSE)
 
-train <- df[train_indices,]
-test <- df[-train_indices,]
+#train <- df[train_indices,]
+#test <- df[-train_indices,]
 
 # feature engineering
 find_na <- function(df){
@@ -81,13 +81,26 @@ getmode <- function(x) {
 
 visualize_na(train)
 
+# delete column
 train <- delete_na(train, 0.8)
+train <- train %>% select(!Id)
+shape(train)
+
+# fill quantitative variables
 train <- replace_(train, "LotFrontage", value = "xbar")
+train <- replace_(train, "GarageArea", value = "xbar")
+
+# fill qualitative variables
 train <- replace_(train, "GarageYrBlt", value = "mode")
 train <- replace_(train, "GarageType", value = "mode")
 train <- replace_(train, "GarageQual", value = "mode")
 train <- replace_(train, "GarageCond", value = "mode")
 train <- replace_(train, "GarageFinish", value = "mode")
+train <- replace_(train, "MasVnrArea", value = "mode")
+train <- replace_(train, "MasVnrType", value = "mode")
+train <- replace_(train, "FireplaceQu", value = "mode")
+
+
 visualize_na(train)
 
 
